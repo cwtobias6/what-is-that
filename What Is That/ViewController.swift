@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+class ViewController: UIViewController, UINavigationControllerDelegate {
     
     
     @IBOutlet weak var imageView: UIImageView!
@@ -42,6 +42,14 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         photoLibraryPicker.sourceType = .photoLibrary
         photoLibraryPicker.allowsEditing = false
         
+        present(photoLibraryPicker, animated: true, completion: nil)
     }
+    
 }
 
+extension ViewController: UIImagePickerControllerDelegate {
+    
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        dismiss(animated: true, completion: nil)
+    }
+}
