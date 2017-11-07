@@ -14,7 +14,6 @@ class ViewController: UIViewController, UINavigationControllerDelegate {
     
     
     @IBOutlet weak var imageView: UIImageView!
-    @IBOutlet weak var classifier: UILabel! // MARK: TODO: Use autolayout to center this on all devices!!
     
     var model: Inceptionv3!
     
@@ -66,7 +65,6 @@ extension ViewController: UIImagePickerControllerDelegate {
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         
         imagePickerControllerDidCancel(picker)
-        classifier.text = "... Analyzing Image ..."
         
         if let userPickedImage = info[UIImagePickerControllerOriginalImage] as? UIImage {
             
@@ -79,9 +77,37 @@ extension ViewController: UIImagePickerControllerDelegate {
             detect(image: convertedCIImage)
             
         }
+        
+        
     }
     
     func detect(image: CIImage) {
+        
+        guard let model = try? VNCoreMLModel(for: Inceptionv3().model) else {
+            fatalError("CoreML Model Failed to load")
+        }
+        
+        let request = VNCoreMLRequest(model: model) { (request, error) in
+            
+            guard let results = request.results as? [VNClassificationObservation] else {
+                fatalError("Model Failed to Process Image.")
+            }
+            
+            let classification = request.results?.first as? VNClassificationObservation
+            
+            self.navigationItem.title = classification?.identifier.capitalized
+            
+        }
+        
+        let handler = VNImageRequestHandler(ciImage: image)
+        
+        do {
+            try handler.perform([request])
+            
+        } catch {
+            print(error)
+        }
+        
         
     }
     
